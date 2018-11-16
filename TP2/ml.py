@@ -27,7 +27,7 @@ data = data.drop('StudyID', 1)
 
 data = data.fillna(data.median())
 
-# Visualizar gráficos de distribuição das features
+# Gerar gráficos de distribuição das features
 
 mkdir("figures")
 
@@ -38,6 +38,7 @@ for key in data.keys():
     data.hist(column=key, bins=nbins)
     fig_name = "dist-" + key + ".png"
     plt.savefig("figures/" + fig_name)
+    # plt.show()
 
 # Normalização
 
