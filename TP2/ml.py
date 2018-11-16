@@ -1,6 +1,20 @@
 import pandas as pd
-import numpy as np
+import os
 from sklearn import preprocessing
+from matplotlib import pyplot as plt
+from math import sqrt
+
+
+def mkdir(name):
+    try:
+        os.rmdir(name)
+    except OSError:
+        pass
+    try:
+        os.mkdir(name)
+    except OSError:
+        pass
+
 
 data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
 
@@ -9,21 +23,23 @@ data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
 data = data.drop('ExamID', 1)
 data = data.drop('StudyID', 1)
 
-# Substituir NaN por valor da média
+# Substituir NaN por valor da mediana
 
 data = data.fillna(data.median())
 
+# Visualizar gráficos de distribuição das features
+
+mkdir("figures")
+
+nrows = data.shape[0]
+nbins = int(round(sqrt(nrows)))
+
+for key in data.keys():
+    data.hist(column=key, bins=nbins)
+    fig_name = "dist-" + key + ".png"
+    plt.savefig("figures/" + fig_name)
+
 # Normalização
-
-# neg_cols = []
-#
-# for key in data.keys():
-#     for item in data[key]:
-#         if (item <= 0):
-#             neg_cols.append(key)
-#             break
-
-# print(neg_cols)
 
 for key in data.keys():
     # if key in neg_cols:
@@ -36,4 +52,3 @@ for key in data.keys():
     data_scaled = data_scaler.fit_transform(input_data)
     data[key] = pd.DataFrame(data_scaled)
 
-# print(data)
