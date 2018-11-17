@@ -1,8 +1,11 @@
 import pandas as pd
 import os
 from sklearn import preprocessing
+from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 from matplotlib import pyplot as plt
 from math import sqrt
+
+from sklearn.svm import SVC
 
 
 def mkdir(name):
@@ -39,8 +42,11 @@ for key in data.keys():
     fig_name = "dist-" + key + ".png"
     plt.savefig("figures/" + fig_name)
     # plt.show()
+    # print(key)
 
 # Normalização
+
+y = data['PSS_Stress']
 
 for key in data.keys():
     # if key in neg_cols:
@@ -53,3 +59,23 @@ for key in data.keys():
     data_scaled = data_scaler.fit_transform(input_data)
     data[key] = pd.DataFrame(data_scaled)
 
+data['PSS_Stress'] = y
+
+# Modelo e K-Fold Cross Validation
+
+svm = SVC(kernel='linear', C=1)
+svm.fit(data, data['PSS_Stress'])
+
+label_encoding = preprocessing.LabelEncoder()
+training_scores_enc = label_encoding.fit_transform(data['PSS_Stress'])
+
+cv = KFold(n_splits=10)
+scores = cross_val_score(svm, data, training_scores_enc, cv=cv)
+print(scores)
+
+'''
+- Normalização vs standardização
+- Normalizar coluna output?
+- Utilizar coluna de output no treino?
+- Resultados?
+'''
