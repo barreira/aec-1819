@@ -67,7 +67,7 @@ for key in data.keys():
 
 clf = SVC(kernel='linear', C=0.025)
 
-# Dividir do dataset em treino/teste
+# Dividir dataset em treino/teste
 
 x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.4, random_state=0)
 
