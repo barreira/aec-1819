@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from sklearn import preprocessing
-from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
+from sklearn.model_selection import KFold, cross_val_score, cross_val_predict, train_test_split
 from matplotlib import pyplot as plt
 from math import sqrt
 
@@ -19,12 +19,19 @@ def mkdir(name):
         pass
 
 
+# Ler dados do ficheiro .csv
+
 data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
 
 # Remover ExamID e StudyID
 
 data = data.drop('ExamID', 1)
 data = data.drop('StudyID', 1)
+
+# Retirar coluna de output 'PSS_Stress' do conjunto de dados (para variável auxiliar)
+
+target = data['PSS_Stress']
+data = data.drop('PSS_Stress', 1)
 
 # Substituir NaN por valor da mediana
 
@@ -42,11 +49,8 @@ for key in data.keys():
     fig_name = "dist-" + key + ".png"
     plt.savefig("figures/" + fig_name)
     # plt.show()
-    # print(key)
 
 # Normalização
-
-y = data['PSS_Stress']
 
 for key in data.keys():
     # if key in neg_cols:
@@ -59,19 +63,34 @@ for key in data.keys():
     data_scaled = data_scaler.fit_transform(input_data)
     data[key] = pd.DataFrame(data_scaled)
 
-data['PSS_Stress'] = y
+# Criação do classificador (i.e. modelo)
+
+clf = SVC(kernel='linear', C=0.025)
+
+# Divisão do dataset em treino/teste
+
+x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.4, random_state=0)
+
+# Treino do modelo
+
+clf.fit(x_train, y_train)
+ 
+# Teste do modelo
+
+print(clf.score(x_test, y_test))
+
 
 # Modelo e K-Fold Cross Validation
 
-svm = SVC(kernel='linear', C=1)
-svm.fit(data, data['PSS_Stress'])
-
-label_encoding = preprocessing.LabelEncoder()
-training_scores_enc = label_encoding.fit_transform(data['PSS_Stress'])
-
-cv = KFold(n_splits=10)
-scores = cross_val_score(svm, data, training_scores_enc, cv=cv)
-print(scores)
+# svm = SVC(kernel='linear', C=1)
+# svm.fit(data, data['PSS_Stress'])
+#
+# label_encoding = preprocessing.LabelEncoder()
+# training_scores_enc = label_encoding.fit_transform(data['PSS_Stress'])
+#
+# cv = KFold(n_splits=10)
+# scores = cross_val_score(svm, data, training_scores_enc, cv=cv)
+# print(scores)
 
 '''
 - Normalização vs standardização
