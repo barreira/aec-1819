@@ -1,0 +1,21 @@
+1. Data acquisition
+
+2. Data visualization
+
+3. Data preprocessing
+    - Missing data filtering
+    - Feature selection
+    - Normalization/Standardization
+    - etc.
+
+4. Model training and validation
+
+5. Model selection
+
+6. Hyperparameter optimization
+
+
+Tutorial: https://scikit-learn.org/stable/tutorial/basic/tutorial.html
+Classificadores: https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html
+Cross-validation: https://scikit-learn.org/stable/modules/cross_validation.html#cross-validation
+Hyperparameter optimization: https://scikit-learn.org/stable/modules/grid_search.html#grid-search
