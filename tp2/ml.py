@@ -50,7 +50,7 @@ for key in data.keys():
     plt.savefig("figures/" + fig_name)
     # plt.show()
 
-# Normalização
+# Normalizar dados
 
 for key in data.keys():
     # if key in neg_cols:
@@ -63,19 +63,19 @@ for key in data.keys():
     data_scaled = data_scaler.fit_transform(input_data)
     data[key] = pd.DataFrame(data_scaled)
 
-# Criação do classificador (i.e. modelo)
+# Criar classificador (i.e. modelo)
 
 clf = SVC(kernel='linear', C=0.025)
 
-# Divisão do dataset em treino/teste
+# Dividir do dataset em treino/teste
 
 x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.4, random_state=0)
 
-# Treino do modelo
+# Treinar o modelo
 
 clf.fit(x_train, y_train)
- 
-# Teste do modelo
+
+# Testar o modelo
 
 print(clf.score(x_test, y_test))
 
@@ -95,6 +95,4 @@ print(clf.score(x_test, y_test))
 '''
 - Normalização vs standardização
 - Normalizar coluna output?
-- Utilizar coluna de output no treino?
-- Resultados?
 '''
