@@ -69,11 +69,12 @@ for key in data.keys():
 selector = SelectKBest(chi2, k=3)
 selector.fit(data, target)
 cols = selector.get_support(indices=True)
+cols_names = list(data.columns[cols])
 
-for idx, c in enumerate(cols):
-    print("*" * (len(cols) - idx) + " " * idx, c, data.columns[c])
+for idx, (ci, cn) in enumerate(zip(cols, cols_names)):
+    print("*" * (len(cols) - idx) + " " * idx, ci, cn)
 
-data = data.drop(data.columns[cols], axis=1)
+data = data[cols_names]
 
 # Criar classificador (i.e. modelo)
 
