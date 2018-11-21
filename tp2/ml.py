@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from sklearn import preprocessing
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.model_selection import KFold, cross_val_score, cross_val_predict, train_test_split
 from matplotlib import pyplot as plt
 from math import sqrt
@@ -62,6 +63,17 @@ for key in data.keys():
     data_scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
     data_scaled = data_scaler.fit_transform(input_data)
     data[key] = pd.DataFrame(data_scaled)
+
+# Feature selection
+
+selector = SelectKBest(chi2, k=3)
+selector.fit(data, target)
+cols = selector.get_support(indices=True)
+
+for idx, c in enumerate(cols):
+    print("*" * (len(cols) - idx) + " " * idx, c, data.columns[c])
+
+data = data.drop(data.columns[cols], axis=1)
 
 # Criar classificador (i.e. modelo)
 
