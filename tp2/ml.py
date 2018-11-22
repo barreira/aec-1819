@@ -130,8 +130,12 @@ print("Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 #     scores = cross_val_score(clf, data, target, cv=5)
 #     print(name, "Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 
+# Hyperparameter optimization (falta isto)
+
 '''
 - resultados muito baixos
+- warnings
+- ultimo modelo nao funciona
 - data['averageExcessOfDistanceBetweenClicks'] tem valores muito pequenos por causa dos outliers
 - Normalizar coluna output?
 '''
