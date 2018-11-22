@@ -5,7 +5,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, ShuffleSplit
 from matplotlib import pyplot as plt
 from math import sqrt
 
@@ -60,17 +60,17 @@ for key in data.keys():
 
 # Normalizar dados
 
-# values = data.values
-# normalizer = preprocessing.Normalizer(norm='l1')  # ou 'l2'
-# values_normalized = normalizer.transform(values)
-# data = pd.DataFrame(values_normalized, columns=data.columns)
+values = data.values
+normalizer = preprocessing.Normalizer(norm='l1')  # ou 'l2'
+values_normalized = normalizer.transform(values)
+data = pd.DataFrame(values_normalized, columns=data.columns)
 
 # Standardizar dados
 
-values = data.values
-scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
-values_standardized = scaler.fit_transform(values)
-data = pd.DataFrame(values_standardized, columns=data.columns)
+# values = data.values
+# scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
+# values_standardized = scaler.fit_transform(values)
+# data = pd.DataFrame(values_standardized, columns=data.columns)
 
 # # Quando temos outliers, é melhor usar outro scaler (?)
 # values = data[['averageExcessOfDistanceBetweenClicks']].values
@@ -103,7 +103,8 @@ clf = KNeighborsClassifier()
 # clf = GaussianNB()
 # clf = QuadraticDiscriminantAnalysis()  # é o único que não está a dar
 
-scores = cross_val_score(clf, data, target, cv=5)
+cv = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+scores = cross_val_score(clf, data, target, cv=cv)
 '''
 Warning: The least populated class in y has only 1 members, which is too few. The minimum number of members in any class
 cannot be less than n_splits=5.
@@ -127,12 +128,17 @@ print("Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 #              "Neural Net", "AdaBoost", "Naive Bayes", "QDA"]
 #
 # for name, clf in zip(clf_names, clf_models):
-#     scores = cross_val_score(clf, data, target, cv=5)
+#     cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
+#     scores = cross_val_score(clf, data, target, cv=cv)
 #     print(name, "Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 
 # Hyperparameter optimization (falta isto)
 
+
+
 '''
+- pode-se fazer feature selection antes de norm/stand
+- type(data e target) vs. type(data.values e target.values)
 - resultados muito baixos
 - warnings
 - ultimo modelo nao funciona
