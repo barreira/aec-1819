@@ -104,6 +104,11 @@ clf = KNeighborsClassifier()
 # clf = QuadraticDiscriminantAnalysis()  # é o único que não está a dar
 
 scores = cross_val_score(clf, data, target, cv=5)
+'''
+Warning: The least populated class in y has only 1 members, which is too few. The minimum number of members in any class
+cannot be less than n_splits=5.
+'''
+
 print("Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 
 # clf_models = [
