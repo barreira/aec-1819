@@ -58,10 +58,15 @@ for key in data.keys():
     plt.savefig("figures/" + fig_name)
 
 
+print("### Normalization ###\n")
+
 # Normalizar dados
+
 normalizer = preprocessing.Normalizer(norm='l1')  # ou 'l2'
 values_normalized = normalizer.transform(data.values)
 data = pd.DataFrame(values_normalized, columns=data.columns)
+
+# Feature Selection
 
 selector = SelectKBest(f_classif, k=5)
 selector.fit(data, target)
@@ -69,12 +74,12 @@ cols = selector.get_support(indices=True)
 
 cols_names = list(data.columns[cols])
 
-print("##### Normalization ####")
-
 for idx, (ci, cn) in enumerate(zip(cols, cols_names)):
     print("*" * (len(cols) - idx) + " " * idx, ci, cn)
 
 data = data[cols_names]
+
+# Criar modelos
 
 clf_models = [
     KNeighborsClassifier(),
@@ -88,14 +93,18 @@ clf_models = [
     # QuadraticDiscriminantAnalysis()  # é o único que não está a dar
 ]
 
-clf_names = ["Nearest Neighbors", "SVM", "Gaussian Process", "Decision Tree", "Random Forest",
-             "Neural Net", "AdaBoost", "Naive Bayes", "QDA"]
+clf_names = ["Nearest Neighbors", "SVM", "Gaussian Process", "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
+             "Naive Bayes", "QDA"]
+
+# K-Fold Cross-validation e Calcular resultados
 
 for name, clf in zip(clf_names, clf_models):
     cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
     scores = cross_val_score(clf, data, target, cv=cv)
     print(name, "Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 
+
+print("\n\n### Standardization ###")
 
 # Standardizar dados
 
@@ -110,9 +119,6 @@ data = pd.DataFrame(values_standardized, columns=data.columns)
 
 # Feature selection
 
-print("\n\n\n\n\n\n##### Standardization ####")
-
-
 selector = SelectKBest(f_classif, k=5)
 selector.fit(data, target)
 cols = selector.get_support(indices=True)
@@ -122,6 +128,8 @@ for idx, (ci, cn) in enumerate(zip(cols, cols_names)):
     print("*" * (len(cols) - idx) + " " * idx, ci, cn)
 
 data = data[cols_names]
+
+# Criar modelos
 
 clf_models = [
     KNeighborsClassifier(),
@@ -135,8 +143,10 @@ clf_models = [
     # QuadraticDiscriminantAnalysis()  # é o único que não está a dar
 ]
 
-clf_names = ["Nearest Neighbors", "SVM", "Gaussian Process", "Decision Tree", "Random Forest",
-             "Neural Net", "AdaBoost", "Naive Bayes", "QDA"]
+clf_names = ["Nearest Neighbors", "SVM", "Gaussian Process", "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
+             "Naive Bayes", "QDA"]
+
+# K-Fold Cross-validation e Calcular resultados
 
 for name, clf in zip(clf_names, clf_models):
     cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)

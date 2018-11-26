@@ -5,8 +5,6 @@ from sklearn.model_selection import cross_val_score, ShuffleSplit
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
 
-
-# Melhorar a adaBoost
 # Ler dados do ficheiro .csv
 
 data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
@@ -41,7 +39,11 @@ for idx, (ci, cn) in enumerate(zip(cols, cols_names)):
 
 data = data[cols_names]
 
+# Criar melhor modelo (AdaBoost)
+
 clf_model = AdaBoostClassifier(RandomForestClassifier(max_depth=200, criterion="entropy"), n_estimators=50)
+
+# K-Fold Cross-validation e Calcular resultados
 
 cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
 scores = cross_val_score(clf_model, data, target, cv=cv)
