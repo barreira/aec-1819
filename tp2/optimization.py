@@ -1,9 +1,7 @@
-import random
-
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.model_selection import cross_val_score, ShuffleSplit, RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 import scipy.stats as ss
 import numpy as np
 
@@ -59,11 +57,12 @@ data = data[cols_names]
 
 clf_model = SVC()
 
-param_dist = {'C': np.random.uniform(low=0.0, high=20.0, size=(20,)),
+param_dist = {'C': ss.randint(1,10),
               'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
               'degree': ss.randint(1, 20),
               'gamma': ['auto', 'scale'],
-              'coef0': np.random.uniform(low=0.0, high=20.0, size=(20,)),
+              # 'coef0': np.random.uniform(low=0.0, high=20.0, size=(10,)),
+              'coef0': ss.randint(1,10),
               'shrinking': [True, False],
               'probability': [True, False],
               'tol': ss.uniform,
@@ -73,9 +72,3 @@ n_iter = 20
 rs = RandomizedSearchCV(clf_model, param_distributions=param_dist, n_iter=n_iter, cv=5)
 rs.fit(data, target)
 report(rs.cv_results_)
-
-# K-Fold Cross-validation e Calcular resultados
-
-# cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
-# scores = cross_val_score(clf_model, data, target, cv=cv)
-# print("Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
