@@ -1,11 +1,27 @@
+import random
+
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.model_selection import cross_val_score, ShuffleSplit
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.model_selection import cross_val_score, ShuffleSplit, RandomizedSearchCV
+import scipy.stats as ss
+import numpy as np
+
+
+def report(results, n_top=3):
+    for i in range(1, n_top + 1):
+        candidates = np.flatnonzero(results['rank_test_score'] == i)
+        for candidate in candidates:
+            print("Model with rank: {0}".format(i))
+            print("Mean validation score: {0:.3f} (std: {1:.3f})".format(
+                  results['mean_test_score'][candidate],
+                  results['std_test_score'][candidate]))
+            print("Parameters: {0}".format(results['params'][candidate]))
+            print("")
 
 
 # Ler dados do ficheiro .csv
+from sklearn.svm import SVC
 
 data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
 
@@ -23,9 +39,9 @@ data = data.drop('PSS_Stress', 1)
 
 data = data.fillna(data.median())
 
-normalizer = preprocessing.Normalizer(norm='l1')  # ou 'l2'
-values_normalized = normalizer.transform(data.values)
-data = pd.DataFrame(values_normalized, columns=data.columns)
+robust_scaler = preprocessing.RobustScaler()
+values_standardized = robust_scaler.fit_transform(data.values)
+data = pd.DataFrame(values_standardized, columns=data.columns)
 
 # Feature selection
 
@@ -39,12 +55,27 @@ for idx, (ci, cn) in enumerate(zip(cols, cols_names)):
 
 data = data[cols_names]
 
-# Criar melhor modelo (AdaBoost)
+# Hyper-parameterização
 
-clf_model = AdaBoostClassifier(RandomForestClassifier(max_depth=200, criterion="entropy"), n_estimators=50)
+clf_model = SVC()
+
+param_dist = {'C': np.random.uniform(low=0.0, high=20.0, size=(20,)),
+              'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+              'degree': ss.randint(1, 20),
+              'gamma': ['auto', 'scale'],
+              'coef0': np.random.uniform(low=0.0, high=20.0, size=(20,)),
+              'shrinking': [True, False],
+              'probability': [True, False],
+              'tol': ss.uniform,
+              'decision_function_shape' : ['ovo', 'ovr']}
+
+n_iter = 20
+rs = RandomizedSearchCV(clf_model, param_distributions=param_dist, n_iter=n_iter, cv=5)
+rs.fit(data, target)
+report(rs.cv_results_)
 
 # K-Fold Cross-validation e Calcular resultados
 
-cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
-scores = cross_val_score(clf_model, data, target, cv=cv)
-print("Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
+# cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
+# scores = cross_val_score(clf_model, data, target, cv=cv)
+# print("Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))

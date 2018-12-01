@@ -33,7 +33,7 @@ data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
 
 # Remover ExamID e StudyID
 
-data = data.drop('ExamID', 1)
+#data = data.drop('ExamID', 1)
 data = data.drop('StudyID', 1)
 
 # Retirar coluna de output 'PSS_Stress' do conjunto de dados (para variável auxiliar)
@@ -152,6 +152,3 @@ for name, clf in zip(clf_names, clf_models):
     cv = ShuffleSplit(n_splits=10, test_size=0.6, random_state=0)
     scores = cross_val_score(clf, data, target, cv=cv)
     print(name, "Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
-
-
-# daqui conclui-se que a adaBoost é a melhor tanto com normalization como standardization
