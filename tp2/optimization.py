@@ -1,8 +1,10 @@
 import pandas as pd
+import scipy
 import scipy.stats as ss
 import numpy as np
 
 from sklearn import preprocessing
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -42,9 +44,14 @@ data = data.fillna(data.median())
 
 # Feature selection "manual" (melhores resultados)
 
-cols = [9, 12]
+# cols = [9, 12]
+# cols_names = list(data.columns[cols])
+# data = data[cols_names]
+
+selector = SelectKBest(f_classif, k=5)
+selector.fit(data, target)
+cols = selector.get_support(indices=True)
 cols_names = list(data.columns[cols])
-data = data[cols_names]
 
 # Standardizar
 
@@ -56,7 +63,7 @@ data = pd.DataFrame(values_standardized, columns=data.columns)
 
 clf_model = SVC()
 
-param_dist = {'C': np.random.uniform(low=0.0, high=2.0, size=(10,)),
+param_dist = {'C': scipy.stats.expon(scale=100),
               'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
               'degree': ss.randint(1, 5),
               'gamma': ['auto', 'scale'],

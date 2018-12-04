@@ -13,6 +13,7 @@ import os
 import pandas as pd
 from matplotlib import pyplot as plt
 from math import sqrt
+import numpy as np
 
 
 __author__ = "André Pereira, Carlos Lemos, João Barreira, Rafael Braga"
@@ -105,6 +106,7 @@ def standardizacao_e_resultados(data):
         scores = cross_val_score(clf, data, target, cv=5)
         print(name, "Accuracy: %0.6f (+/- %0.6f)" % (scores.mean(), scores.std() * 2))
 
+
 # Ler dados do ficheiro .csv
 
 data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
@@ -114,26 +116,35 @@ data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
 data = data.drop('ExamID', 1)
 data = data.drop('StudyID', 1)
 
-# Gerar gráficos de distribuição das features
+# Gerar gráficos de distribuição das features (gráficos não estão à mesma escala: utilizar visualization.py para tal)
 
 mkdir("dist")
 
 nRows = data.shape[0]
-nBins = int(round(sqrt(nRows)))
+nBins = int(round(sqrt(nRows)))  # binning
 
 for key in data.keys():
     data.hist(column=key, bins=nBins)
     fig_name = "dist-" + key + ".png"
     plt.savefig("dist/" + fig_name)
 
+# Imprimir informação sobre dataset para ficheiro
+
+pd.options.display.max_columns = 2000
+print(data.describe(), file=open("dataset_description.txt", 'w'))
+
 # Retirar coluna de output 'PSS_Stress' do conjunto de dados (para variável auxiliar)
 
 target = data['PSS_Stress']
 data = data.drop('PSS_Stress', 1)
 
-# Substituir NaN por valor da mediana
+# Missing Data Filtering
 
-data = data.fillna(data.median())
+# print(data.isnull().any(axis=1).sum())  # número de registos que possuem pelo menos um valor 'NaN'
+
+data = data.fillna(data.median())  # substituir NaN por valor da mediana
+# data = data.fillna(data.mean())  # substituir NaN por valor da média
+# data = data.dropna()  # descartar registos que possuem NaN
 
 # Feature selection
 

@@ -1,8 +1,11 @@
 import pandas as pd
+import scipy
 import scipy.stats as ss
 import numpy as np
 
 from sklearn import preprocessing
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -40,14 +43,6 @@ data = data.drop('PSS_Stress', 1)
 
 data = data.fillna(data.median())
 
-# Binarização da coluna do resultado
-
-for i, value in enumerate(target):
-    if value > 40:
-        target[i] = 1  # muito stressado
-    else:
-        target[i] = 0  # pouco stressado
-
 # Feature selection "manual" (melhores resultados)
 
 cols = [9, 12]
@@ -60,11 +55,19 @@ robust_scaler = preprocessing.RobustScaler()
 values_standardized = robust_scaler.fit_transform(data.values)
 data = pd.DataFrame(values_standardized, columns=data.columns)
 
+# Discretizar coluna de output (PSS_Stress) VARIAR NBINS
+
+target = np.array(target)
+enc = KBinsDiscretizer(n_bins=4, encode='ordinal', strategy='quantile')  # VARIAR NBINS
+enc.fit(target.reshape(-1, 1))
+target = enc.transform(target.reshape(-1, 1))
+target = np.ravel(target)
+
 # Hyper-parametrização
 
 clf_model = SVC()
 
-param_dist = {'C': np.random.uniform(low=0.0, high=2.0, size=(10,)),
+param_dist = {'C': scipy.stats.expon(scale=100),
               'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
               'degree': ss.randint(1, 5),
               'gamma': ['auto', 'scale'],
@@ -74,8 +77,8 @@ param_dist = {'C': np.random.uniform(low=0.0, high=2.0, size=(10,)),
               'tol': np.random.uniform(low=0.0, high=2.0, size=(10,)),
               'decision_function_shape': ['ovo', 'ovr']}
 
-# Cálculo dos resultados (com hiper-parameterização a 50 iterações e 5-fold cross validation)
+# Cálculo dos resultados (com hiper-parameterização a 5 iterações e 5-fold cross validation)
 
-rs = RandomizedSearchCV(clf_model, param_distributions=param_dist, n_iter=50, cv=5)
+rs = RandomizedSearchCV(clf_model, param_distributions=param_dist, n_iter=5, cv=5)
 rs.fit(data, target)
 report(rs.cv_results_)
