@@ -9,7 +9,7 @@ __email__ = "pg38923@alunos.uminho.pt, pg38410@alunos.uminho.pt, a73831@alunos.u
 
 # Ler dados do ficheiro .csv
 
-data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
+data = pd.read_csv("datasets/Dataset_MousePSS.csv", sep=';')
 
 # Remover ExamID e StudyID
 

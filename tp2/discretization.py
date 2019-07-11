@@ -27,7 +27,7 @@ def report(results, n_top=3):
 
 # Ler dados do ficheiro .csv
 
-data = pd.read_csv("../datasets/Dataset_MousePSS.csv", sep=';')
+data = pd.read_csv("datasets/Dataset_MousePSS.csv", sep=';')
 
 # Remover ExamID e StudyID
 
